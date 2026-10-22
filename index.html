@@ -1,2 +1,130 @@
-<!doctype html>
-<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>STEP① 商品検索｜メルカリ調査テスト v0.2</title><style>body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Kaku Gothic ProN',sans-serif;background:#f5f7fa;color:#222;margin:0;padding:20px}main{max-width:700px;margin:auto}h1{font-size:23px}section{background:white;padding:18px;margin:15px 0;border-radius:14px;box-shadow:0 2px 8px #0001}.button{display:block;background:#1368ce;color:white;text-align:center;text-decoration:none;padding:16px;border-radius:10px;font-weight:bold}label{display:block;margin:10px 0 5px}input{width:100%;box-sizing:border-box;padding:11px;border:1px solid #bbb;border-radius:7px;font-size:16px}button{background:#166c51;color:#fff;border:0;padding:12px 18px;border-radius:8px;font-size:16px;margin-top:14px}table{width:100%;border-collapse:collapse}td,th{padding:8px;border-bottom:1px solid #ddd;text-align:left;font-size:13px}.muted{color:#62666b;font-size:13px} .scroll{overflow:auto}</style></head><body><main><h1>STEP① 商品検索　テスト版 v0.2</h1><section><p><strong>検索条件：</strong>アディダスのスニーカー／売り切れ商品／新品・未使用／15,000円以下</p><a class="button" href="https://jp.mercari.com/search?keyword=adidas%20%E3%82%B9%E3%83%8B%E3%83%BC%E3%82%AB%E3%83%BC&status=sold_out" target="_self">メルカリで売り切れを検索</a><p class="muted">検索結果が開いたら、メルカリ側でも「新品、未使用」「15,000円以下」の絞り込みをご確認ください。iPhoneでリンクが動かない場合は、Safariで本HTMLを開くか、リンクを長押ししてください。</p></section><section><h2>確認した商品を手動登録</h2><p class="muted">※メルカリの商品データの自動取得には未対応です。30日以内の売却数は、売却日を確認した商品だけ数えます。</p><form id="form"><label>型番</label><input id="model" required placeholder="例：IF3814"><label>サイズ（cm）</label><input id="size" placeholder="例：27.0"><label>売却価格（円）</label><input id="price" type="number" min="0" max="15000" required><label>売却日（確認できた場合）</label><input id="soldDate" type="date"><label>商品URL（任意）</label><input id="url" type="url" placeholder="https://jp.mercari.com/item/..."><button type="submit">この商品を登録</button></form></section><section><h2>型番別の集計</h2><div class="scroll"><table><thead><tr><th>型番</th><th>登録件数</th><th>30日以内確認済み</th><th>サイズ別</th></tr></thead><tbody id="summary"></tbody></table></div><p class="muted">条件の「30日以内に10件以上」は、確認済みの日付だけで判定します。未確認を推定で加算しません。</p><button id="clear" type="button" style="background:#666">登録データを消去</button></section></main><script>const key='step1_mercari_items_v02';let items=[];try{items=JSON.parse(localStorage.getItem(key)||'[]')}catch(e){}const $=id=>document.getElementById(id);function draw(){let groups={};let today=new Date();today.setHours(0,0,0,0);for(let x of items){let g=groups[x.model]??={all:0,recent:0,sizes:{}};g.all++;if(x.soldDate){let d=new Date(x.soldDate+'T00:00:00');let days=(today-d)/86400000;if(days>=0&&days<=30)g.recent++}let size=x.size||'未確認';g.sizes[size]=(g.sizes[size]||0)+1}let tbody=$('summary');tbody.replaceChildren();for(let [model,g] of Object.entries(groups)){let tr=document.createElement('tr');for(let val of [model,g.all,g.recent,Object.entries(g.sizes).map(([s,n])=>s+':'+n).join('、')]){let td=document.createElement('td');td.textContent=val;tr.append(td)}tbody.append(tr)}if(!items.length){let tr=document.createElement('tr');let td=document.createElement('td');td.colSpan=4;td.textContent='登録データはまだありません';tr.append(td);tbody.append(tr)}}$('form').addEventListener('submit',e=>{e.preventDefault();items.push({model:$('model').value.trim().toUpperCase(),size:$('size').value.trim(),price:Number($('price').value),soldDate:$('soldDate').value,url:$('url').value});localStorage.setItem(key,JSON.stringify(items));e.target.reset();draw()});$('clear').addEventListener('click',()=>{if(confirm('登録データをすべて消去しますか？')){items=[];localStorage.removeItem(key);draw()}});draw()</script></body></html>
+ <section>
+    <p><strong>検索条件：</strong>アディダスのスニーカー／売り切れ商品／新品・未使用／15,000円以下</p>
+    <a class="button" href="https://jp.mercari.com/search?keyword=adidas%20%E3%82%B9%E3%83%8B%E3%83%BC%E3%82%AB%E3%83%BC&status=sold_out" target="_self">
+      メルカリで売り切れを検索
+    </a>
+    <p class="muted">
+      検索結果が開いたら、メルカリ側でも「新品、未使用」「15,000円以下」の絞り込みをご確認ください。iPhoneでリンクが動かない場合は、Safariで本HTMLを開くか、リンクを長押ししてください。
+    </p>
+  </section>
+
+  <section>
+    <h2>確認した商品を手動登録</h2>
+    <p class="muted">※メルカリの商品データの自動取得には未対応です。30日以内の売却数は、売却日を確認した商品だけ数えます。</p>
+
+    <form id="form">
+      <label>型番</label>
+      <input id="model" required placeholder="例：IF3814">
+
+      <label>サイズ（cm）</label>
+      <input id="size" placeholder="例：27.0">
+
+      <label>売却価格（円）</label>
+      <input id="price" type="number" min="0" max="15000" required>
+
+      <label>売却日（確認できた場合）</label>
+      <input id="soldDate" type="date">
+
+      <label>商品URL（任意）</label>
+      <input id="url" type="url" placeholder="https://jp.mercari.com/item/...">
+
+      <button type="submit">この商品を登録</button>
+    </form>
+  </section>
+
+  <section>
+    <h2>型番別の集計</h2>
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>型番</th>
+            <th>登録件数</th>
+            <th>30日以内確認済み</th>
+            <th>サイズ別</th>
+          </tr>
+        </thead>
+        <tbody id="summary"></tbody>
+      </table>
+    </div>
+    <p class="muted">条件の「30日以内に10件以上」は、確認済みの日付だけで判定します。未確認を推定で加算しません。</p>
+    <button id="clear" type="button" style="background:#666">登録データを消去</button>
+  </section>
+</main>
+
+<script>
+  const key = 'step1_mercari_items_v02';
+  let items = [];
+
+  try {
+    items = JSON.parse(localStorage.getItem(key) || '[]');
+  } catch (e) {}
+
+  const $ = id => document.getElementById(id);
+
+  function draw() {
+    let groups = {};
+    let today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    for (let x of items) {
+      let g = groups[x.model] ??= { all: 0, recent: 0, sizes: {} };
+      g.all++;
+
+      if (x.soldDate) {
+        let d = new Date(x.soldDate + 'T00:00:00');
+        let days = (today - d) / 86400000;
+        if (days >= 0 && days <= 30) g.recent++;
+      }
+
+      let size = x.size || '未確認';
+      g.sizes[size] = (g.sizes[size] || 0) + 1;
+    }
+
+    let tbody = $('summary');
+    tbody.replaceChildren();
+
+    for (let [model, g] of Object.entries(groups)) {
+      let tr = document.createElement('tr');
+      for (let val of [model, g.all, g.recent, Object.entries(g.sizes).map(([s, n]) => s + ':' + n).join('、')]) {
+        let td = document.createElement('td');
+        td.textContent = val;
+        tr.append(td);
+      }
+      tbody.append(tr);
+    }
+
+    if (!items.length) {
+      let tr = document.createElement('tr');
+      let td = document.createElement('td');
+      td.colSpan = 4;
+      td.textContent = '登録データはまだありません';
+      tr.append(td);
+      tbody.append(tr);
+    }
+  }
+
+  $('form').addEventListener('submit', e => {
+    e.preventDefault();
+    items.push({
+      model: $('model').value.trim().toUpperCase(),
+      size: $('size').value.trim(),
+      price: Number($('price').value),
+      soldDate: $('soldDate').value,
+      url: $('url').value
+    });
+    localStorage.setItem(key, JSON.stringify(items));
+    e.target.reset();
+    draw();
+  });
+
+  $('clear').addEventListener('click', () => {
+    if (confirm('登録データをすべて消去しますか？')) {
+      items = [];
+      localStorage.removeItem(key);
+      draw();
+    }
+  });
+
+  draw();
+</script>
